@@ -9,7 +9,7 @@
 
 「Tunnelの状態を見せて」「ssh-mcp.appserver.tokyoをTunnel経由で公開して」と言うだけで、Tunnel ingress設定・CNAME作成・Access保護まで一括実行します。
 
-69のMCPツール × 16カテゴリで、Tunnel・DNS・Zone・Access・Billing・Workers・Pages・R2・KV・SSLをCloudflareダッシュボードを開かずにAIから直接操作できます。
+65のMCPツール × 15カテゴリで、Tunnel・DNS・Zone・Access・Billing・Workers・Pages・R2・KV・SSLをCloudflareダッシュボードを開かずにAIから直接操作できます。
 
 ## なぜ必要か
 
@@ -20,7 +20,7 @@ Cloudflare公式のMCPコネクタ（`bindings.mcp.cloudflare.com`）は存在�
 - 「今月の請求額を確認」「SSL設定をチェック」という**運用監視**が必要
 - 「Workers/Pagesのデプロイ状況を確認してロールバック」という**デプロイ管理**が必要
 
-このMCPサーバーは、これらを**69ツールでフルカバー**し、さらに複数API呼び出しを束ねた**ワークフローツール**で1コマンド操作を実現します。
+このMCPサーバーは、これらを**65ツールでフルカバー**し、さらに複数API呼び出しを束ねた**ワークフローツール**で1コマンド操作を実現します。
 
 **公式コネクタは接続不要です。** 本MCPが公式の全機能を包含しているため、両方接続するとツールが重複して混乱します。
 
@@ -35,7 +35,7 @@ Cloudflare公式のMCPコネクタ（`bindings.mcp.cloudflare.com`）は存在�
 │  API操作ツール（66ツール / 15カテゴリ）     │
 │  Tunnel(10) DNS(4) Zone(5) Access(10)     │
 │  Workers(7) Pages(7) R2(5) KV(5)          │
-│  Billing(4) Registrar(3) SSL(2) Account(4) │
+│  Billing(4) SSL(2) Account(3)          │
 ├──────────────────────────────────────────┤
 │  Cloudflare API v4 クライアント            │
 │  エラーハンドリング / レート制限対応          │
@@ -176,8 +176,6 @@ claude mcp add --transport http cloudflare \
 
 | ツール | 制限 | 代替手段 |
 |:--|:--|:--|
-| `cf_get_user` | `/user`エンドポイントはUser-level権限が必要。ダッシュボードのカスタムトークン作成画面では設定不可（API経由でのみ設定可能） | `cf_list_account_members` でメンバー情報を確認 |
-| `cf_list_registrar_domains` 等 | Registrar APIのパーミッションはダッシュボードのトークン作成画面に表示されない（Cloudflare既知の制限）。Global API Key（レガシー）でのみアクセス可能 | `cf_list_zones` でゾーン情報を確認 |
 | `cf_list_r2_buckets` 等 | R2がアカウントで未有効化の場合エラー | ダッシュボード → R2 Object Storage → 「Get Started」で有効化 |
 
 ### Tunnel設定の全体置換
@@ -206,7 +204,7 @@ Cloudflare: 1,200 req / 5分。`cf_tunnel_status_summary` は内部で複数API�
 | SSL/TLS | ❌ | ✅ 設定・証明書 |
 | ワークフロー | ❌ | ✅ publish / unpublish / summary |
 
-## ツール一覧（69ツール / 16カテゴリ）
+## ツール一覧（65ツール / 15カテゴリ）
 
 | カテゴリ | ツール数 | 主な操作 |
 |:--|:--|:--|
@@ -215,9 +213,8 @@ Cloudflare: 1,200 req / 5分。`cf_tunnel_status_summary` は内部で複数API�
 | Tunnel接続 | 2 | list_connections / clean_connections |
 | DNS | 4 | list / create / update / delete |
 | ゾーン | 5 | list / get / create / delete / settings |
-| アカウント | 4 | list / get / members / user |
+| アカウント | 3 | list / get / members |
 | 課金 | 4 | profile / history / subscriptions / usage |
-| Registrar | 3 | list / get / update ※制限あり |
 | Access Apps | 5 | list / get / create / update / delete |
 | Access Policies | 5 | list / get / create / update / delete |
 | Workers | 7 | list / get / delete / deployments / settings / routes / subdomain |
@@ -232,11 +229,6 @@ Cloudflare: 1,200 req / 5分。`cf_tunnel_status_summary` は内部で複数API�
 **Q: 公式コネクタは使わなくていい？**
 → はい。本MCPが全機能を包含。両方接続するとツールが重複して混乱します。
 
-**Q: Registrarのツールが使えない**
-→ Cloudflareの既知の制限です。Registrar APIのパーミッションはダッシュボードのトークン作成画面に存在しません。Global API Key（レガシー）でのみアクセス可能です。ドメイン情報は `cf_list_zones` で確認できます。
-
-**Q: cf_get_userが403になる**
-→ `/user`エンドポイントはUser-level権限が必要で、ダッシュボードのカスタムトークン画面では設定できません。代わりに `cf_list_account_members` を使ってください。
 
 **Q: R2のツールがエラーになる**
 → R2がアカウントで有効化されていない可能性があります。ダッシュボード → R2 Object Storage → 「Get Started」で有効化してください。

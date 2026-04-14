@@ -13,7 +13,6 @@ import { registerTunnelConnectionTools } from "./tools/tunnel-connections.js";
 import { registerWorkflowTools } from "./tools/workflows.js";
 // Phase 2 tools
 import { registerBillingTools } from "./tools/billing.js";
-import { registerRegistrarTools } from "./tools/registrar.js";
 import { registerAccessAppTools } from "./tools/access-apps.js";
 import { registerAccessPolicyTools } from "./tools/access-policies.js";
 import { registerSslTools } from "./tools/ssl.js";
@@ -29,8 +28,8 @@ export function createServer(): McpServer {
     version: "1.0.0",
   });
 
-  // Phase 1: Account + Zone + DNS + Tunnel + Workflows (26 tools)
-  registerAccountTools(server);          // 4 tools
+  // Phase 1: Account + Zone + DNS + Tunnel + Workflows (25 tools)
+  registerAccountTools(server);          // 3 tools
   registerZoneTools(server);             // 5 tools
   registerDnsTools(server);              // 4 tools
   registerTunnelTools(server);           // 6 tools
@@ -38,9 +37,8 @@ export function createServer(): McpServer {
   registerTunnelConnectionTools(server); // 2 tools
   registerWorkflowTools(server);         // 3 tools
 
-  // Phase 2: Billing, Registrar, Access, SSL (19 tools)
+  // Phase 2: Billing, Access, SSL (16 tools)
   registerBillingTools(server);          // 4 tools
-  registerRegistrarTools(server);        // 3 tools
   registerAccessAppTools(server);        // 5 tools
   registerAccessPolicyTools(server);     // 5 tools
   registerSslTools(server);              // 2 tools
@@ -92,8 +90,8 @@ async function runHTTP(): Promise<void> {
       name: "cloudflare-mcp",
       version: "1.0.0",
       status: "ok",
-      tools: 69,
-      categories: 16,
+      tools: 65,
+      categories: 15,
     });
   });
 

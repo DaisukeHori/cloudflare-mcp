@@ -19,8 +19,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
       name: "cloudflare-mcp",
       version: "1.0.0",
       status: "ok",
-      tools: 69,
-      categories: 16,
+      tools: 65,
+      categories: 15,
       docs: "https://github.com/DaisukeHori/cloudflare-mcp",
     });
     return;

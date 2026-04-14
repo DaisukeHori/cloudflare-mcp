@@ -44,7 +44,6 @@ describe("tool naming conventions", () => {
       "../src/tools/billing.js",
       "../src/tools/zones.js",
       "../src/tools/dns.js",
-      "../src/tools/registrar.js",
       "../src/tools/tunnel.js",
       "../src/tools/tunnel-config.js",
       "../src/tools/tunnel-connections.js",
