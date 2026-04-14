@@ -84,7 +84,7 @@ Args:
           return {
             content: [{
               type: "text",
-              text: "⚠️ /user エンドポイントにはUser-levelのトークン権限が必要です（Account-scopeのAPIトークンではアクセスできません）。\n\n代替手段: cf_list_account_members でアカウントメンバー情報を確認できます。",
+              text: "⚠️ /user エンドポイントにはUser-levelの「User Details: Read」権限が必要です。\nこの権限はダッシュボードのカスタムトークン作成画面には表示されません（API経由でのみ設定可能）。\n\n代替手段: cf_list_account_members でアカウントメンバー情報を確認できます。",
             }],
           };
         }

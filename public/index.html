@@ -161,8 +161,8 @@ footer a{color:var(--muted)}
       </div>
 
       <div class="cat-card">
-        <h3><span class="icon registrar">R</span>Registrar（3）</h3>
-        <div class="tools"><code>cf_list_registrar_domains</code> <code>cf_get_registrar_domain</code> <code>cf_update_registrar_domain</code></div>
+        <h3><span class="icon registrar">R</span>Registrar（3）<span style="font-size:12px;color:var(--accent2);margin-left:auto">※制限あり</span></h3>
+        <div class="tools"><code>cf_list_registrar_domains</code> <code>cf_get_registrar_domain</code> <code>cf_update_registrar_domain</code><br><span style="font-size:12px;color:var(--muted)">※ダッシュボードのトークン作成画面にRegistrar権限が存在しない（CF既知の制限）。Global API Keyでのみ利用可</span></div>
       </div>
 
       <div class="cat-card">
@@ -207,7 +207,7 @@ footer a{color:var(--muted)}
           <tr><td>Zone管理</td><td class="no">✗</td><td class="yes">✓ CRUD + 設定</td></tr>
           <tr><td>Access (App/Policy)</td><td class="no">✗</td><td class="yes">✓ App + Policy CRUD</td></tr>
           <tr><td>Billing</td><td class="no">✗</td><td class="yes">✓ プロフィール・履歴・サブスク</td></tr>
-          <tr><td>Registrar</td><td class="no">✗</td><td class="yes">✓ 一覧・詳細・更新</td></tr>
+          <tr><td>Registrar</td><td class="no">✗</td><td class="partial">△ Global API Key必須（CF制限）</td></tr>
           <tr><td>Workers</td><td class="partial">△ 一覧+コード取得のみ</td><td class="yes">✓ + デプロイ・設定・ルート</td></tr>
           <tr><td>KV</td><td class="partial">△ Namespace CRUDのみ</td><td class="yes">✓ + キー一覧・値取得</td></tr>
           <tr><td>R2</td><td class="partial">△ バケットのみ</td><td class="yes">✓ + オブジェクト一覧</td></tr>

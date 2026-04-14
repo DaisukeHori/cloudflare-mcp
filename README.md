@@ -9,7 +9,7 @@
 
 「Tunnelの状態を見せて」「ssh-mcp.appserver.tokyoをTunnel経由で公開して」と言うだけで、Tunnel ingress設定・CNAME作成・Access保護まで一括実行します。
 
-69のMCPツール × 16カテゴリで、Tunnel・DNS・Zone・Registrar・Access・Billing・Workers・Pages・R2・KV・SSLをCloudflareダッシュボードを開かずにAIから直接操作できます。
+69のMCPツール × 16カテゴリで、Tunnel・DNS・Zone・Access・Billing・Workers・Pages・R2・KV・SSLをCloudflareダッシュボードを開かずにAIから直接操作できます。
 
 ## なぜ必要か
 
@@ -17,7 +17,7 @@ Cloudflare公式のMCPコネクタ（`bindings.mcp.cloudflare.com`）は存在�
 
 実際のCloudflareインフラ管理には：
 - 「Tunnelを作成してingressを設定してCNAMEも作ってAccessで保護」という**複数リソースの連携**が必要
-- 「ドメインの有効期限が近いものを確認」「今月の請求額を確認」という**運用監視**が必要
+- 「今月の請求額を確認」「SSL設定をチェック」という**運用監視**が必要
 - 「Workers/Pagesのデプロイ状況を確認してロールバック」という**デプロイ管理**が必要
 
 このMCPサーバーは、これらを**69ツールでフルカバー**し、さらに複数API呼び出しを束ねた**ワークフローツール**で1コマンド操作を実現します。
@@ -50,17 +50,16 @@ Cloudflare公式のMCPコネクタ（`bindings.mcp.cloudflare.com`）は存在�
 
 AI: cf_tunnel_status_summary を実行します。
 
-    📊 Tunnel Status Summary — 合計: 3トンネル
+    📊 Tunnel Status Summary — 合計: 15トンネル
 
-    🟢 ccp-proxmox [healthy] — 接続数: 2
+    🟢 Proxmox [healthy] — 接続数: 4
         proxmox.appserver.tokyo → https://192.168.70.226:8006
         ccp.appserver.tokyo → http://localhost:3000
 
-    🟢 revol-web [healthy] — 接続数: 1
-        www.revol.co.jp → http://localhost:8080
+    🟢 dify [healthy] — 接続数: 4
+        dify.appserver.tokyo → http://localhost:8080
 
-    ⚪ test-tunnel [inactive] — 接続数: 0
-        (公開ホスト名なし)
+    ⚪ WindowsTest [inactive] — 接続数: 0
 ```
 
 ```
@@ -69,23 +68,17 @@ AI: cf_tunnel_status_summary を実行します。
 AI: cf_publish_hostname を実行します。
 
     🚀 ホスト名を公開しました。
-
-    ✅ ゾーン特定: appserver.tokyo (abc123)
-    ✅ Ingress追加: ssh-mcp.appserver.tokyo → http://localhost:3000
-    ✅ CNAME作成: ssh-mcp.appserver.tokyo → tunnel-id.cfargotunnel.com
-
+    ✅ Ingress追加 + CNAME作成 完了
     URL: https://ssh-mcp.appserver.tokyo
 ```
 
 ## 🔒 セキュリティ
 
-**Q: 公開エンドポイントにCloudflareトークンを送っても大丈夫？**
-
-- 通信は全て **HTTPS（TLS暗号化）** で保護されます
-- サーバーは**ステートレス**です。トークンはVercel環境変数に保存され、リクエスト処理中にのみ使用されます
-- MCP接続には **API Key認証**（`?key=`パラメータ）が必須です
-- ソースコードは**全て公開**されています
-- 全ての**破壊的操作に `confirm: true` が必須**です
+- 通信は全て **HTTPS（TLS暗号化）** で保護
+- サーバーは**ステートレス**。トークンはVercel環境変数に保存、リクエスト処理中にのみ使用
+- MCP接続には **API Key認証**（`?key=`パラメータ）が必須
+- ソースコードは**全て公開**
+- 全ての**破壊的操作に `confirm: true` が必須**
 
 ## クイックスタート（3ステップ）
 
@@ -115,60 +108,39 @@ AI: cf_publish_hostname を実行します。
 | 12 | **ゾーン** | DNS | 編集 |
 | 13 | **ゾーン** | SSL および証明書 | 読み取り |
 
-> ⚠️ 行10〜13は左のドロップダウンを**「ゾーン」に切り替え**てください（デフォルトの「アカウント」ではなく）。
+> ⚠️ 行10〜13は左のドロップダウンを**「ゾーン」に切り替え**てください。
 
-**アカウント リソース:**
-- `含む` > 自分のアカウント（例: `Hori@revol.co.jp's Account`）
+**アカウント リソース:** `含む` > 自分のアカウント（例: `Hori@revol.co.jp's Account`）
+**ゾーン リソース:** `含む` > `すべてのゾーン`
+**クライアント IP アドレス フィルタリング:** 空のまま
+**TTL:** 空のまま
 
-**ゾーン リソース:**
-- `含む` > `すべてのゾーン`
+→ **「概要に進む」→「トークンを作成」→ トークンをコピー**
 
-**クライアント IP アドレス フィルタリング:** 空のまま（設定不要）
-
-**TTL:** 空のまま（無期限）
-
-→ **「概要に進む」→「トークンを作成」→ 表示されたトークンをコピー**
-
-### ステップ2: Vercelにデプロイ
-
-**ワンクリックデプロイ:**
+### ステップ2: デプロイ
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FDaisukeHori%2Fcloudflare-mcp&env=MCP_API_KEY%2CCF_API_TOKEN%2CCF_ACCOUNT_ID&project-name=cloudflare-mcp&repository-name=cloudflare-mcp)
 
-**環境変数（Vercel Settings > Environment Variables）:**
-
-| 変数 | 値 | 説明 |
-|:--|:--|:--|
-| `MCP_API_KEY` | `cfmcp-` + ランダム文字列 | MCP接続認証キー |
-| `CF_API_TOKEN` | ステップ1で作成したトークン | Cloudflare API認証 |
-| `CF_ACCOUNT_ID` | CloudflareアカウントID | 下記参照 |
-
-> **CF_ACCOUNT_IDの確認方法:** Cloudflareダッシュボードにログイン → 任意のゾーンを選択 → 概要ページ右下の「API」セクション → 「アカウント ID」をコピー
-
-**手動デプロイ:**
-
-```bash
-git clone https://github.com/DaisukeHori/cloudflare-mcp.git
-cd cloudflare-mcp
-npm install && npm run build
-npx vercel --prod
-```
+| 環境変数 | 値 |
+|:--|:--|
+| `MCP_API_KEY` | `cfmcp-` + ランダム文字列 |
+| `CF_API_TOKEN` | ステップ1で作成したトークン |
+| `CF_ACCOUNT_ID` | CloudflareアカウントID（ダッシュボードURL内の英数字列） |
 
 ### ステップ3: MCPサーバーを接続
 
-**Claude.ai（Web）:**
-Settings → MCP → Add Server:
+**Claude.ai:** Settings → MCP → Add Server:
 ```
-https://cloudflare-mcp.vercel.app/api/mcp?key=YOUR_MCP_API_KEY
+https://your-project.vercel.app/api/mcp?key=YOUR_MCP_API_KEY
 ```
 
-**Claude Desktop / Cursor / VS Code / Windsurf:**
+**Claude Desktop / Cursor:**
 ```json
 {
   "mcpServers": {
     "cloudflare": {
       "command": "npx",
-      "args": ["-y", "mcp-remote", "https://cloudflare-mcp.vercel.app/api/mcp?key=YOUR_MCP_API_KEY"]
+      "args": ["-y", "mcp-remote", "https://your-project.vercel.app/api/mcp?key=YOUR_MCP_API_KEY"]
     }
   }
 }
@@ -177,7 +149,7 @@ https://cloudflare-mcp.vercel.app/api/mcp?key=YOUR_MCP_API_KEY
 **Claude Code:**
 ```bash
 claude mcp add --transport http cloudflare \
-  "https://cloudflare-mcp.vercel.app/api/mcp?key=YOUR_MCP_API_KEY"
+  "https://your-project.vercel.app/api/mcp?key=YOUR_MCP_API_KEY"
 ```
 
 ## ⚠️ 重要な注意事項
@@ -200,6 +172,14 @@ claude mcp add --transport http cloudflare \
 | `cf_delete_kv_namespace` | KV + 全キー/値削除 |
 | `cf_unpublish_hostname` | ingress除去 + CNAME削除 |
 
+### 既知のプラットフォーム制限
+
+| ツール | 制限 | 代替手段 |
+|:--|:--|:--|
+| `cf_get_user` | `/user`エンドポイントはUser-level権限が必要。ダッシュボードのカスタムトークン作成画面では設定不可（API経由でのみ設定可能） | `cf_list_account_members` でメンバー情報を確認 |
+| `cf_list_registrar_domains` 等 | Registrar APIのパーミッションはダッシュボードのトークン作成画面に表示されない（Cloudflare既知の制限）。Global API Key（レガシー）でのみアクセス可能 | `cf_list_zones` でゾーン情報を確認 |
+| `cf_list_r2_buckets` 等 | R2がアカウントで未有効化の場合エラー | ダッシュボード → R2 Object Storage → 「Get Started」で有効化 |
+
 ### Tunnel設定の全体置換
 
 `cf_update_tunnel_config` は **PUT（全体置換）**。既存設定を維持する場合は先に `cf_get_tunnel_config` で取得してください。
@@ -219,7 +199,6 @@ Cloudflare: 1,200 req / 5分。`cf_tunnel_status_summary` は内部で複数API�
 | Zone管理 | ❌ | ✅ CRUD + 設定 |
 | Access | ❌ | ✅ App + Policy CRUD |
 | Billing | ❌ | ✅ プロフィール・履歴・サブスク |
-| Registrar | ❌ | ✅ 一覧・詳細・更新 |
 | Workers | △ 一覧+コード取得のみ | ✅ + デプロイ・設定・ルート |
 | KV | △ Namespace CRUDのみ | ✅ + キー一覧・値取得 |
 | R2 | △ バケットのみ | ✅ + オブジェクト一覧 |
@@ -238,7 +217,7 @@ Cloudflare: 1,200 req / 5分。`cf_tunnel_status_summary` は内部で複数API�
 | ゾーン | 5 | list / get / create / delete / settings |
 | アカウント | 4 | list / get / members / user |
 | 課金 | 4 | profile / history / subscriptions / usage |
-| Registrar | 3 | list / get / update |
+| Registrar | 3 | list / get / update ※制限あり |
 | Access Apps | 5 | list / get / create / update / delete |
 | Access Policies | 5 | list / get / create / update / delete |
 | Workers | 7 | list / get / delete / deployments / settings / routes / subdomain |
@@ -248,18 +227,19 @@ Cloudflare: 1,200 req / 5分。`cf_tunnel_status_summary` は内部で複数API�
 | SSL | 2 | setting / certificates |
 | ワークフロー | 3 | publish / unpublish / summary |
 
-**R** = ReadOnly, **W** = Write, **⚠️** = 破壊的操作（`confirm: true` 必須）
-
 ## FAQ
 
 **Q: 公式コネクタは使わなくていい？**
 → はい。本MCPが全機能を包含。両方接続するとツールが重複して混乱します。
 
-**Q: APIトークンの権限が多すぎない？**
-→ 使わないカテゴリの権限は省略可能。対応ツール呼び出し時にのみ必要です。
+**Q: Registrarのツールが使えない**
+→ Cloudflareの既知の制限です。Registrar APIのパーミッションはダッシュボードのトークン作成画面に存在しません。Global API Key（レガシー）でのみアクセス可能です。ドメイン情報は `cf_list_zones` で確認できます。
 
-**Q: ドメインの購入はできる？**
-→ 購入APIはEnterprise限定の可能性あり。登録済みドメインの管理は可能です。
+**Q: cf_get_userが403になる**
+→ `/user`エンドポイントはUser-level権限が必要で、ダッシュボードのカスタムトークン画面では設定できません。代わりに `cf_list_account_members` を使ってください。
+
+**Q: R2のツールがエラーになる**
+→ R2がアカウントで有効化されていない可能性があります。ダッシュボード → R2 Object Storage → 「Get Started」で有効化してください。
 
 **Q: Freeプランでも使える？**
 → 大半のツールは利用可能です。
@@ -269,10 +249,7 @@ Cloudflare: 1,200 req / 5分。`cf_tunnel_status_summary` は内部で複数API�
 ```bash
 git clone https://github.com/DaisukeHori/cloudflare-mcp.git
 cd cloudflare-mcp && npm install
-
-cp .env.example .env.local
-# .env.local を編集
-
+cp .env.example .env.local  # 編集してください
 npm run dev   # HTTPモード起動
 npm test      # テスト実行（29テスト）
 ```

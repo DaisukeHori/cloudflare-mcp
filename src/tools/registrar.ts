@@ -30,7 +30,7 @@ export function registerRegistrarTools(server: McpServer): void {
           return {
             content: [{
               type: "text",
-              text: "⚠️ Registrar APIにアクセスできません。\n\n考えられる原因:\n1. APIトークンに「Domain Registration: Read」権限が不足しています。Cloudflareダッシュボードでトークンを編集し、アカウント > Domain Registration > 読み取り を追加してください。\n2. ドメインがCloudflare Registrarで管理されていない場合、このAPIは利用できません。",
+              text: "⚠️ Registrar APIにアクセスできません。\n\nこれはCloudflareプラットフォームの既知の制限です:\n- Registrar APIのパーミッションはダッシュボードのトークン作成画面に表示されません\n- APIトークンではなくGlobal API Key（レガシー）でのみアクセス可能です\n- ドメイン登録（新規）のAPIはEnterprise限定です\n\nドメイン情報は cf_list_zones でゾーン単位の確認が可能です。",
             }],
           };
         }
