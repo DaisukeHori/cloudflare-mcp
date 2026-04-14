@@ -202,3 +202,6 @@ Claude.ai / MCP Client
 ## ライセンス
 
 MIT
+
+---
+_Deployed on 2026-04-14_
