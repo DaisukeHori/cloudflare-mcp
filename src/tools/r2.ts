@@ -16,10 +16,23 @@ export function registerR2Tools(server: McpServer): void {
       annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     },
     async ({ cursor, per_page }) => {
-      const data = await cfRequest<{ buckets: CfR2Bucket[] }>("GET", accountPath("/r2/buckets"), {
-        params: { cursor, per_page },
-      });
-      return { content: [{ type: "text", text: formatJson(data.result) }] };
+      try {
+        const data = await cfRequest<{ buckets: CfR2Bucket[] }>("GET", accountPath("/r2/buckets"), {
+          params: { cursor, per_page },
+        });
+        return { content: [{ type: "text", text: formatJson(data.result) }] };
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        if (msg.includes("10042") || msg.includes("enable R2")) {
+          return {
+            content: [{
+              type: "text",
+              text: "⚠️ R2 Storageがこのアカウントで有効化されていません。\n\nCloudflareダッシュボード → R2 Object Storage → 「Get Started」で有効化してください。\nhttps://dash.cloudflare.com/?to=/:account/r2",
+            }],
+          };
+        }
+        throw err;
+      }
     }
   );
 

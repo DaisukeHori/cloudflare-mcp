@@ -68,13 +68,28 @@ Args:
     "cf_get_user",
     {
       title: "Get Current User",
-      description: `現在のAPIトークンに紐づくユーザー情報を取得します。メールアドレス、名前、2FA状態等が含まれます。`,
+      description: `現在のAPIトークンに紐づくユーザー情報を取得します。メールアドレス、名前、2FA状態等が含まれます。
+
+注意: このエンドポイントはUser-levelのトークン権限が必要です。Account-scopeのAPIトークンでは403が返る場合があります。その場合は cf_list_account_members でメンバー情報を確認してください。`,
       inputSchema: {},
       annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     },
     async () => {
-      const data = await cfRequest<CfUser>("GET", "/user");
-      return { content: [{ type: "text", text: formatJson(data.result) }] };
+      try {
+        const data = await cfRequest<CfUser>("GET", "/user");
+        return { content: [{ type: "text", text: formatJson(data.result) }] };
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        if (msg.includes("403")) {
+          return {
+            content: [{
+              type: "text",
+              text: "⚠️ /user エンドポイントにはUser-levelのトークン権限が必要です（Account-scopeのAPIトークンではアクセスできません）。\n\n代替手段: cf_list_account_members でアカウントメンバー情報を確認できます。",
+            }],
+          };
+        }
+        throw err;
+      }
     }
   );
 }

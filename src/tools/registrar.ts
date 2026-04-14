@@ -13,16 +13,29 @@ export function registerRegistrarTools(server: McpServer): void {
       annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     },
     async () => {
-      const data = await cfRequest<CfRegistrarDomain[]>("GET", accountPath("/registrar/domains"));
-      const domains = data.result.map((d) => ({
-        domain_name: d.domain_name,
-        status: d.status,
-        expires_at: d.expires_at,
-        auto_renew: d.auto_renew,
-        locked: d.locked,
-        privacy: d.privacy,
-      }));
-      return { content: [{ type: "text", text: formatJson(domains) }] };
+      try {
+        const data = await cfRequest<CfRegistrarDomain[]>("GET", accountPath("/registrar/domains"));
+        const domains = data.result.map((d) => ({
+          domain_name: d.domain_name,
+          status: d.status,
+          expires_at: d.expires_at,
+          auto_renew: d.auto_renew,
+          locked: d.locked,
+          privacy: d.privacy,
+        }));
+        return { content: [{ type: "text", text: formatJson(domains) }] };
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        if (msg.includes("403") || msg.includes("10000")) {
+          return {
+            content: [{
+              type: "text",
+              text: "⚠️ Registrar APIにアクセスできません。\n\n考えられる原因:\n1. APIトークンに「Domain Registration: Read」権限が不足しています。Cloudflareダッシュボードでトークンを編集し、アカウント > Domain Registration > 読み取り を追加してください。\n2. ドメインがCloudflare Registrarで管理されていない場合、このAPIは利用できません。",
+            }],
+          };
+        }
+        throw err;
+      }
     }
   );
 
