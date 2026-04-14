@@ -156,37 +156,37 @@ footer a{color:var(--muted)}
       </div>
 
       <div class="cat-card">
-        <h3><span class="icon billing">B</span>課金（4）<span style="font-size:12px;color:var(--muted);margin-left:auto">Phase 2</span></h3>
+        <h3><span class="icon billing">B</span>課金（4）</h3>
         <div class="tools"><code>cf_get_billing_profile</code> <code>cf_get_billing_history</code> <code>cf_list_account_subscriptions</code> <code>cf_get_billing_usage</code></div>
       </div>
 
       <div class="cat-card">
-        <h3><span class="icon registrar">R</span>Registrar（3）<span style="font-size:12px;color:var(--muted);margin-left:auto">Phase 2</span></h3>
+        <h3><span class="icon registrar">R</span>Registrar（3）</h3>
         <div class="tools"><code>cf_list_registrar_domains</code> <code>cf_get_registrar_domain</code> <code>cf_update_registrar_domain</code></div>
       </div>
 
       <div class="cat-card">
-        <h3><span class="icon access">P</span>Access（10）<span style="font-size:12px;color:var(--muted);margin-left:auto">Phase 2</span></h3>
+        <h3><span class="icon access">P</span>Access（10）</h3>
         <div class="tools"><code>cf_list_access_apps</code> <code>cf_create_access_app</code> <code>cf_update_access_app</code> <code>cf_delete_access_app</code> + Policy CRUD（5）</div>
       </div>
 
       <div class="cat-card">
-        <h3><span class="icon workers">W</span>Workers（7）<span style="font-size:12px;color:var(--muted);margin-left:auto">Phase 3</span></h3>
+        <h3><span class="icon workers">W</span>Workers（7）</h3>
         <div class="tools"><code>cf_list_workers</code> <code>cf_get_worker</code> <code>cf_delete_worker</code> <code>cf_list_worker_deployments</code> + 設定・ルート</div>
       </div>
 
       <div class="cat-card">
-        <h3><span class="icon pages">P</span>Pages（7）<span style="font-size:12px;color:var(--muted);margin-left:auto">Phase 3</span></h3>
+        <h3><span class="icon pages">P</span>Pages（7）</h3>
         <div class="tools"><code>cf_list_pages_projects</code> <code>cf_create_pages_deployment</code> <code>cf_rollback_pages_deployment</code> + プロジェクトCRUD</div>
       </div>
 
       <div class="cat-card">
-        <h3><span class="icon r2">R</span>R2 Storage（5）<span style="font-size:12px;color:var(--muted);margin-left:auto">Phase 3</span></h3>
+        <h3><span class="icon r2">R</span>R2 Storage（5）</h3>
         <div class="tools"><code>cf_list_r2_buckets</code> <code>cf_create_r2_bucket</code> <code>cf_get_r2_bucket</code> <code>cf_delete_r2_bucket</code> <code>cf_list_r2_objects</code></div>
       </div>
 
       <div class="cat-card">
-        <h3><span class="icon kv">K</span>KV Storage（5）<span style="font-size:12px;color:var(--muted);margin-left:auto">Phase 3</span></h3>
+        <h3><span class="icon kv">K</span>KV Storage（5）</h3>
         <div class="tools"><code>cf_list_kv_namespaces</code> <code>cf_create_kv_namespace</code> <code>cf_delete_kv_namespace</code> <code>cf_list_kv_keys</code> <code>cf_get_kv_value</code></div>
       </div>
 
@@ -205,14 +205,14 @@ footer a{color:var(--muted)}
           <tr><td>Tunnel管理</td><td class="no">✗</td><td class="yes">✓ CRUD + ingress + token</td></tr>
           <tr><td>DNS管理</td><td class="no">✗</td><td class="yes">✓ CRUD</td></tr>
           <tr><td>Zone管理</td><td class="no">✗</td><td class="yes">✓ CRUD + 設定</td></tr>
-          <tr><td>Access (App/Policy)</td><td class="no">✗</td><td class="yes">✓ Phase 2</td></tr>
-          <tr><td>Billing</td><td class="no">✗</td><td class="yes">✓ Phase 2</td></tr>
-          <tr><td>Registrar</td><td class="no">✗</td><td class="yes">✓ Phase 2</td></tr>
+          <tr><td>Access (App/Policy)</td><td class="no">✗</td><td class="yes">✓ App + Policy CRUD</td></tr>
+          <tr><td>Billing</td><td class="no">✗</td><td class="yes">✓ プロフィール・履歴・サブスク</td></tr>
+          <tr><td>Registrar</td><td class="no">✗</td><td class="yes">✓ 一覧・詳細・更新</td></tr>
           <tr><td>Workers</td><td class="partial">△ 一覧+コード取得のみ</td><td class="yes">✓ + デプロイ・設定・ルート</td></tr>
           <tr><td>KV</td><td class="partial">△ Namespace CRUDのみ</td><td class="yes">✓ + キー一覧・値取得</td></tr>
           <tr><td>R2</td><td class="partial">△ バケットのみ</td><td class="yes">✓ + オブジェクト一覧</td></tr>
-          <tr><td>Pages</td><td class="no">✗</td><td class="yes">✓ Phase 3</td></tr>
-          <tr><td>SSL/TLS</td><td class="no">✗</td><td class="yes">✓ Phase 2</td></tr>
+          <tr><td>Pages</td><td class="no">✗</td><td class="yes">✓ プロジェクト + デプロイ + ロールバック</td></tr>
+          <tr><td>SSL/TLS</td><td class="no">✗</td><td class="yes">✓ 設定・証明書</td></tr>
           <tr><td>ワークフロー</td><td class="no">✗</td><td class="yes">✓ publish/unpublish/summary</td></tr>
         </tbody>
       </table>
@@ -228,7 +228,26 @@ footer a{color:var(--muted)}
         <div class="step-num">1</div>
         <div class="step-content">
           <h4>Cloudflare APIトークンを作成</h4>
-          <p>Cloudflareダッシュボードでカスタムトークンを作成。Tunnel: Edit, Zone: Read, DNS: Edit 等の権限を付与。</p>
+          <p>ダッシュボード → APIトークン → カスタム トークンを作成する</p>
+          <pre class="code-block">トークン名: cloudflare-mcp
+
+権限（「＋ さらに追加する」で1行ずつ追加）:
+  アカウント | Cloudflare Tunnel  | 編集
+  アカウント | Access: Apps       | 編集
+  アカウント | Access: Policies   | 編集
+  アカウント | Workers スクリプト   | 編集
+  アカウント | Workers KV Storage | 編集
+  アカウント | Workers R2 Storage | 編集
+  アカウント | Cloudflare Pages   | 編集
+  アカウント | アカウント設定       | 編集
+  アカウント | 請求               | 編集
+  ゾーン     | ゾーン             | 編集
+  ゾーン     | ゾーン設定          | 編集
+  ゾーン     | DNS               | 編集
+  ゾーン     | SSL および証明書    | 読み取り
+
+アカウント リソース: 含む > 自分のアカウント
+ゾーン リソース: 含む > すべてのゾーン</pre>
         </div>
       </div>
       <div class="step">

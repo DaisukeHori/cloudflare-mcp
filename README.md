@@ -91,48 +91,78 @@ AI: cf_publish_hostname を実行します。
 
 ### ステップ1: Cloudflare APIトークンを作成
 
-[Cloudflareダッシュボード](https://dash.cloudflare.com/profile/api-tokens) → API Tokens → Create Token → **Custom Token**
+[Cloudflareダッシュボード](https://dash.cloudflare.com/profile/api-tokens) → APIトークン → **トークンを作成する** → **カスタム トークンを作成する**
 
-**必要な権限:**
+**トークン名:** `cloudflare-mcp`
 
-| カテゴリ | リソース | 権限 | 用途 |
+**権限の追加（「＋ さらに追加する」で1行ずつ追加）:**
+
+> 下記はCloudflareダッシュボード上の実際のラベルに合わせて記載しています。
+
+| # | 左ドロップダウン | 中央ドロップダウン | 右ドロップダウン |
 |:--|:--|:--|:--|
-| Account | Cloudflare Tunnel | Edit | Tunnel CRUD・ingress・接続管理 |
-| Account | Access: Apps and Policies | Edit | Accessアプリ・ポリシー |
-| Account | Workers Scripts | Edit | Workers管理 |
-| Account | Workers KV Storage | Edit | KV管理 |
-| Account | Workers R2 Storage | Edit | R2バケット管理 |
-| Account | Cloudflare Pages | Edit | Pages管理 |
-| Account | Account Settings | Read | アカウント情報・メンバー |
-| Account | Billing | Read | 課金情報 |
-| Zone | Zone | Read | ゾーン一覧 |
-| Zone | Zone Settings | Read | ゾーン設定 |
-| Zone | DNS | Edit | DNSレコード管理 |
-| Zone | SSL and Certificates | Read | SSL証明書 |
+| 1 | アカウント | Cloudflare Tunnel | 編集 |
+| 2 | アカウント | Access: Apps | 編集 |
+| 3 | アカウント | Access: Policies | 編集 |
+| 4 | アカウント | Workers スクリプト | 編集 |
+| 5 | アカウント | Workers KV Storage | 編集 |
+| 6 | アカウント | Workers R2 Storage | 編集 |
+| 7 | アカウント | Cloudflare Pages | 編集 |
+| 8 | アカウント | アカウント設定 | 編集 |
+| 9 | アカウント | 請求 | 編集 |
+| 10 | **ゾーン** | ゾーン | 編集 |
+| 11 | **ゾーン** | ゾーン設定 | 編集 |
+| 12 | **ゾーン** | DNS | 編集 |
+| 13 | **ゾーン** | SSL および証明書 | 読み取り |
 
-**Account Resources:** `Include > All accounts`
-**Zone Resources:** `Include > All zones`
+> ⚠️ 行10〜13は左のドロップダウンを**「ゾーン」に切り替え**てください（デフォルトの「アカウント」ではなく）。
 
-> 使わないカテゴリの権限は省略可能。対応ツール呼び出し時にのみ権限が必要です。
+**アカウント リソース:**
+- `含む` > 自分のアカウント（例: `Hori@revol.co.jp's Account`）
 
-### ステップ2: デプロイ
+**ゾーン リソース:**
+- `含む` > `すべてのゾーン`
+
+**クライアント IP アドレス フィルタリング:** 空のまま（設定不要）
+
+**TTL:** 空のまま（無期限）
+
+→ **「概要に進む」→「トークンを作成」→ 表示されたトークンをコピー**
+
+### ステップ2: Vercelにデプロイ
+
+**ワンクリックデプロイ:**
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FDaisukeHori%2Fcloudflare-mcp&env=MCP_API_KEY%2CCF_API_TOKEN%2CCF_ACCOUNT_ID&project-name=cloudflare-mcp&repository-name=cloudflare-mcp)
 
-| 環境変数 | 値 |
-|:--|:--|
-| `MCP_API_KEY` | `cfmcp-` + ランダム文字列 |
-| `CF_API_TOKEN` | ステップ1で作成したトークン |
-| `CF_ACCOUNT_ID` | CloudflareアカウントID |
+**環境変数（Vercel Settings > Environment Variables）:**
+
+| 変数 | 値 | 説明 |
+|:--|:--|:--|
+| `MCP_API_KEY` | `cfmcp-` + ランダム文字列 | MCP接続認証キー |
+| `CF_API_TOKEN` | ステップ1で作成したトークン | Cloudflare API認証 |
+| `CF_ACCOUNT_ID` | CloudflareアカウントID | 下記参照 |
+
+> **CF_ACCOUNT_IDの確認方法:** Cloudflareダッシュボードにログイン → 任意のゾーンを選択 → 概要ページ右下の「API」セクション → 「アカウント ID」をコピー
+
+**手動デプロイ:**
+
+```bash
+git clone https://github.com/DaisukeHori/cloudflare-mcp.git
+cd cloudflare-mcp
+npm install && npm run build
+npx vercel --prod
+```
 
 ### ステップ3: MCPサーバーを接続
 
-**Claude.ai:** Settings → MCP → Add Server:
+**Claude.ai（Web）:**
+Settings → MCP → Add Server:
 ```
 https://cloudflare-mcp.vercel.app/api/mcp?key=YOUR_MCP_API_KEY
 ```
 
-**Claude Desktop / Cursor:**
+**Claude Desktop / Cursor / VS Code / Windsurf:**
 ```json
 {
   "mcpServers": {
@@ -218,13 +248,15 @@ Cloudflare: 1,200 req / 5分。`cf_tunnel_status_summary` は内部で複数API�
 | SSL | 2 | setting / certificates |
 | ワークフロー | 3 | publish / unpublish / summary |
 
+**R** = ReadOnly, **W** = Write, **⚠️** = 破壊的操作（`confirm: true` 必須）
+
 ## FAQ
 
 **Q: 公式コネクタは使わなくていい？**
-→ はい。本MCPが全機能を包含しています。
+→ はい。本MCPが全機能を包含。両方接続するとツールが重複して混乱します。
 
 **Q: APIトークンの権限が多すぎない？**
-→ 使わないカテゴリは省略可能。対応ツール呼び出し時にのみ必要です。
+→ 使わないカテゴリの権限は省略可能。対応ツール呼び出し時にのみ必要です。
 
 **Q: ドメインの購入はできる？**
 → 購入APIはEnterprise限定の可能性あり。登録済みドメインの管理は可能です。
@@ -238,9 +270,8 @@ Cloudflare: 1,200 req / 5分。`cf_tunnel_status_summary` は内部で複数API�
 git clone https://github.com/DaisukeHori/cloudflare-mcp.git
 cd cloudflare-mcp && npm install
 
-export MCP_API_KEY=cfmcp-test-key
-export CF_API_TOKEN=your_token
-export CF_ACCOUNT_ID=your_account_id
+cp .env.example .env.local
+# .env.local を編集
 
 npm run dev   # HTTPモード起動
 npm test      # テスト実行（29テスト）
